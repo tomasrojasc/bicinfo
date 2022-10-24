@@ -27,3 +27,14 @@
 | GND         | GND         |
 | SCL         | Pin 5       |
 | SDA         | Pin 4       |
+
+### MPU6050
+| module side | ESP32 side |
+|-------------|------------|
+| VCC         | 3V3        |
+| GND         | GND        |
+| SCL         | Pin 5      |
+| SDA         | Pin 4      |
+| XDA         | -          |
+| ADC         | -          |
+| INT         | -          |
