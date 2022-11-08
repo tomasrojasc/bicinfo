@@ -24,14 +24,14 @@ GND -> GND
 SCL -> Pin 5
 SDA -> Pin 4
 """
-
+import time
 from machine import SoftI2C, Pin, SoftSPI, UART
 import utime
 from utils.micropyGPS import MicropyGPS
 from drivers.bmp280 import *
 from utils.bmp280 import calculate_altitude_from_pressure
 from drivers.mpu6050 import accel
-from utils.writeSD import read_values
+from utils.writeSD import read_values, create_file_sd_card, write_data_to_file
 import os
 from drivers.sdcard import SDCard
 
@@ -55,12 +55,32 @@ sd = SDCard(spi_sd, Pin(27))
 vfs = os.VfsFat(sd)
 os.mount(vfs, "/sd")
 
+# I/O
+green_led = Pin(23, Pin.OUT)
+red_led = Pin(22, Pin.OUT)
+start_end_trip_button = Pin(2, Pin.IN)
+
+green_led.value(0)
+red_led.value(0)
+
+start_trip_state = 0
 
 while True:
-    line = gpsModule.readline()
-    utime.sleep(0.1)
-    gps_parser.update_from_line(line)
-    print(read_values(gps_parser, mpu, bmp))
-   # print(mpu.get_values()["GyZ"])
+    time.sleep(0.2)
+    if start_end_trip_button.value() == 1:
+        print("trip started")
+        start_trip_state = 1
+        file = create_file_sd_card(gpsModule, gps_parser, mpu, bmp, green_led, red_led)
+
+    while start_trip_state == 1:
+        time.sleep(0.2)
+        write_data_to_file(file, gpsModule, gps_parser, mpu, bmp)
+        if start_end_trip_button.value() == 1:
+            print("trip finished")
+            start_trip_state = 0
+            green_led.value(0)
+            red_led.value(0)
+
+# print(mpu.get_values()["GyZ"])
 
 
