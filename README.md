@@ -38,3 +38,10 @@
 | XDA         | -          |
 | ADC         | -          |
 | INT         | -          |
+
+### I/O
+| device    | ESP32 side |
+|-----------|------------|
+| RED LED   | PIN 22     |
+| GREEN LED | PIN 23     |
+| Button 1  | PIN 2      |
