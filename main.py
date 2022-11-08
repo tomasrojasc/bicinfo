@@ -1,37 +1,9 @@
-"""
-Circuit connections
-
-SD card:
-module side -> ESP32 side
-GND -> GND
-VCC -> 5V
-MISO -> Pin 13
-MOSI -> Pin 12
-SCK -> Pin 14
-CS -> Pin 27
-
-GPS
-module side -> ESP32 side
-GND -> GND
-TX -> Pin 16
-RX -> Pin 17
-VCC -> 3V3
-
-BMP280
-module side -> ESP32 side
-VIN -> 3V3
-GND -> GND
-SCL -> Pin 5
-SDA -> Pin 4
-"""
 import time
 from machine import SoftI2C, Pin, SoftSPI, UART
-import utime
 from utils.micropyGPS import MicropyGPS
 from drivers.bmp280 import *
-from utils.bmp280 import calculate_altitude_from_pressure
 from drivers.mpu6050 import accel
-from utils.writeSD import read_values, create_file_sd_card, write_data_to_file
+from utils.writeSD import create_file_sd_card, write_data_to_file
 import os
 from drivers.sdcard import SDCard
 
@@ -80,7 +52,3 @@ while True:
             start_trip_state = 0
             green_led.value(0)
             red_led.value(0)
-
-# print(mpu.get_values()["GyZ"])
-
-

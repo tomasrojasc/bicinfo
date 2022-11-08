@@ -1,19 +1,4 @@
-"""
-values_now = []
-while True:
-    
-    t0 = read_timestamp()
-    tf = t0+T
-    while read_timestamp()< tf:
-        values_now.append(values_read())
-        sleep(t)
-    average_values_now()
-    show_values_now()
-    write_values_now()
-    values_now = []
-     """
 import time
-
 import os
 
 from utils.bmp280 import calculate_altitude_from_pressure
