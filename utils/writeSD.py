@@ -3,6 +3,7 @@ import os
 
 from utils.bmp280 import calculate_altitude_from_pressure
 
+
 def get_latitude(latitude_from_gps):
     latitude, sign = latitude_from_gps
     if sign=="S":
@@ -12,7 +13,7 @@ def get_latitude(latitude_from_gps):
 
 def get_longitude(longitude_from_gps):
     longitude, sign = longitude_from_gps
-    if sign=="W":
+    if sign == "W":
         longitude *= -1
     return longitude
 
@@ -34,6 +35,7 @@ def read_gps(gps_parser):
     longitude = get_longitude(gps_parser.longitude)
     speed = gps_parser.speed[2]  # km/h
     return [date, timestamp, latitude, longitude, speed]
+
 
 def read_acc(mpu_obj):
     values_of_interest = ["GyX", "GyY", "GyZ"]
@@ -65,6 +67,7 @@ def write_header(file_path):
     f.close()
     return
 
+
 def format_hour(hour):
     """
     This function recieves an hour as a list with numbers corresponfing to [H, M, S]
@@ -73,6 +76,7 @@ def format_hour(hour):
     """
     time = [str(i) for i in hour]
     return "_".join(time)
+
 
 def create_file_sd_card(gpsModule, gps_parser, mpu_obj, bmp, green_led, red_led):
     """
@@ -84,6 +88,7 @@ def create_file_sd_card(gpsModule, gps_parser, mpu_obj, bmp, green_led, red_led)
     :param red_led:
     :return: file path to where to start writing the trip
     """
+
     while read_values(gps_parser, mpu_obj, bmp)[0] == "00/00/00":
         line = gpsModule.readline()
         time.sleep(0.1)
@@ -92,6 +97,7 @@ def create_file_sd_card(gpsModule, gps_parser, mpu_obj, bmp, green_led, red_led)
         red_led.value(1)
         print(read_values(gps_parser, mpu_obj, bmp))
         time.sleep(0.1)
+
     date, hour = read_values(gps_parser, mpu_obj, bmp)[:2]
     date = date.replace("/", "-")
     red_led.value(0)
@@ -124,13 +130,15 @@ def formate_datetime(date, time_):
     datetime = " ".join([date_, time_local_])
     return datetime
 
+
 def create_line_to_write(gps_parser, mpu, bmp):
     line = read_values(gps_parser, mpu, bmp)
     date_, time_ = line[:2]
     line = [formate_datetime(date_, time_)] + line[2:]
-    line = ",".join([str(i) for i in line])
-    line += "\n"
-    return line
+    line_ = ",".join([str(i) for i in line])
+    line_ += "\n"
+    return line_, line
+
 
 def write_data_to_file(file, gpsModule, gps_parser, mpu, bmp):
     """
@@ -150,9 +158,9 @@ def write_data_to_file(file, gpsModule, gps_parser, mpu, bmp):
     time.sleep(0.1)
     gps_parser.update_from_line(line_gps)
     # obtain the line
-    line_to_write = create_line_to_write(gps_parser, mpu, bmp)
+    line_to_write, values = create_line_to_write(gps_parser, mpu, bmp)
     print(line_to_write)
     # write the line
     with open(file, "a") as f:
         f.write(line_to_write)
-    return
+    return values

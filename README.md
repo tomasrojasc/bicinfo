@@ -4,20 +4,20 @@
 | module side  | ESP32 side |
 |--------------|------------|
 | GND          | GND        |
-| VCC          |  5V        |
-| MISO         |  Pin 13    |
-| MOSI         |  Pin 12    |
-| SCK          |  Pin 14    |
-| CS           |  Pin 27    |
+| VCC          | 5V         |
+| MISO         | Pin 13     |
+| MOSI         | Pin 12     |
+| SCK          | Pin 14     |
+| CS           | Pin 27     |
 
 ### GPS
 
 | module side | ESP32 side |
 |-------------|------------|
-| GND         |  GND       |
-| TX          |  Pin 16    |
-| RX          |  Pin 17    |
-| VCC         |  3V3       |
+| GND         | GND        |
+| TX          | Pin 16     |
+| RX          | Pin 17     |
+| VCC         | 5V         |
 
 ### BMP280
 
@@ -40,8 +40,9 @@
 | INT         | -          |
 
 ### I/O
-| device    | ESP32 side |
-|-----------|------------|
-| RED LED   | PIN 22     |
-| GREEN LED | PIN 23     |
-| Button 1  | PIN 2      |
+| device                        | ESP32 side |
+|-------------------------------|------------|
+| RED LED                       | PIN 22     |
+| GREEN LED                     | PIN 23     |
+| Button 1 (Start trip button)  | PIN 2      |
+| Button 2 (switch menu button) | PIN 18     |
