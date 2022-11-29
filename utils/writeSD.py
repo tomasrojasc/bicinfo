@@ -39,7 +39,7 @@ def read_gps(gps_parser):
 
 
 def read_acc(mpu_obj):
-    values_of_interest = ["AyX", "AyY", "AyZ"]
+    values_of_interest = ["AcX", "AcY", "AcZ"]
     mpu_values = mpu_obj.get_values()
     AcXYZ = [mpu_values[i] for i in values_of_interest]
     return get_inclination(*AcXYZ)
@@ -160,6 +160,9 @@ def write_data_to_file(file, gpsModule, gps_parser, mpu, bmp):
     gps_parser.update_from_line(line_gps)
     # obtain the line
     line_to_write, values = create_line_to_write(gps_parser, mpu, bmp)
+    date = line_to_write.split(",")[0]
+    if "00/00/00" in date:
+        return
     print(line_to_write)
     # write the line
     with open(file, "a") as f:

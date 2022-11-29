@@ -18,9 +18,9 @@ def display_menu(lcd_i2c, current_menu_value, values, inclination_0):
     yaw -= yaw_0
 
     if current_menu_value == 0:
-        msg = f"Tu velocidad es:\n{speed}km/h"
+        msg = f"Tu velocidad es:\n {speed}km/h"
     elif current_menu_value == 1:
-        msg = f"La inclinación es:\n{pitch, roll, yaw}%"
+        msg = f"La inclinación es:\n {pitch}%, {roll}%, {yaw}%"
     elif current_menu_value == 2:
-        msg = f"Tu altitud es:\n{altitude}msnm"
+        msg = f"Tu altitud es:\n {altitude}msnm"
     write_lcd(lcd_i2c, msg)

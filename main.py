@@ -64,9 +64,8 @@ while True:
             shift_menu_state += 1
             shift_menu_state %= 3
 
-        display_menu(lcd, shift_menu_state, values)
+        display_menu(lcd, shift_menu_state, values, inclination_0)
 
-        print(values, "holi")
         if start_end_trip_button.value() == 1:
             write_lcd(lcd, "viaje finalizado")
             time.sleep(2)
