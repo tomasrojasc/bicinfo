@@ -8,7 +8,7 @@ from drivers.i2c_lcd import I2cLcd
 from utils.writeSD import create_file_sd_card, write_data_to_file
 import os
 from drivers.sdcard import SDCard
-
+from utils.mpu6050 import get_inclination
 
 # I2C bus
 i2c = SoftI2C(scl=Pin(5), sda=Pin(4))
