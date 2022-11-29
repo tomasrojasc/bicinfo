@@ -9,6 +9,8 @@ from utils.writeSD import create_file_sd_card, write_data_to_file
 import os
 from drivers.sdcard import SDCard
 from utils.mpu6050 import get_inclination
+from utils.writeSD import read_acc
+
 
 # I2C bus
 i2c = SoftI2C(scl=Pin(5), sda=Pin(4))
@@ -52,6 +54,7 @@ while True:
         write_lcd(lcd, "Empezando viaje")
         start_trip_state = 1
         file = create_file_sd_card(gpsModule, gps_parser, mpu, bmp, green_led, red_led)
+        inclination_0 = read_acc(mpu)
 
     while start_trip_state == 1:
         time.sleep(0.2)

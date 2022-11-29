@@ -1,6 +1,7 @@
 import time
 import os
 
+from utils.mpu6050 import get_inclination
 from utils.bmp280 import calculate_altitude_from_pressure
 
 
@@ -38,10 +39,10 @@ def read_gps(gps_parser):
 
 
 def read_acc(mpu_obj):
-    values_of_interest = ["GyX", "GyY", "GyZ"]
+    values_of_interest = ["AyX", "AyY", "AyZ"]
     mpu_values = mpu_obj.get_values()
-    return [mpu_values[i] for i in values_of_interest]
-   
+    AcXYZ = [mpu_values[i] for i in values_of_interest]
+    return get_inclination(*AcXYZ)
 
 def read_values(gps_parser, mpu_obj, bmp):
     """
@@ -61,7 +62,7 @@ def write_header(file_path):
     :param file_path:
     :return:
     """
-    header = "datetime,latitude,longitude,speed,GyX,GyY,GyZ,altitude"
+    header = "datetime,latitude,longitude,speed,pitch,roll,yaw,altitude"
     f = open(file_path, 'w')
     f.write(header + "\n")  # python will convert \n to os.linesep
     f.close()
