@@ -34,7 +34,7 @@ def read_gps(gps_parser):
     timestamp = gps_parser.timestamp
     latitude = get_latitude(gps_parser.latitude)
     longitude = get_longitude(gps_parser.longitude)
-    speed = gps_parser.speed[2]  # km/h
+    speed = round(gps_parser.speed[2])  # km/h
     return [date, timestamp, latitude, longitude, speed]
 
 
@@ -42,7 +42,7 @@ def read_acc(mpu_obj):
     values_of_interest = ["AcX", "AcY", "AcZ"]
     mpu_values = mpu_obj.get_values()
     AcXYZ = [mpu_values[i] for i in values_of_interest]
-    return get_inclination(*AcXYZ)
+    return [round(get_inclination(*AcXYZ)[2])]
 
 def read_values(gps_parser, mpu_obj, bmp):
     """
@@ -58,25 +58,45 @@ def read_values(gps_parser, mpu_obj, bmp):
 
 def write_header(file_path):
     """
-    This function writes the header of the csv file
+    This function writes the header of the gpx file
     :param file_path:
     :return:
     """
     header = "datetime,latitude,longitude,speed,pitch,roll,yaw,altitude"
+    header = """<?xml version="1.0" encoding="UTF-8"?>
+
+    <gpx xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" version="1.1" creator="BicInfo">
+        <metadata>
+            <link href="https://github.com/tomasrojasc/bicinfo">
+                <text>BicInfo</text>
+            </link>
+            <time>2022-12-03T17:39:00-03:00</time>
+        </metadata>
+        <trk>
+            <name>Tu ruta</name>
+        <trkseg>"""
     f = open(file_path, 'w')
     f.write(header + "\n")  # python will convert \n to os.linesep
     f.close()
     return
 
-
+def end_gpx_file(file_path):
+    ending = """        </trkseg>
+        </trk>
+    </gpx>
+    """
+    f = open(file_path, 'a')
+    f.write(ending + "\n")  # python will convert \n to os.linesep
+    f.close()
+    return
 def format_hour(hour):
     """
     This function recieves an hour as a list with numbers corresponfing to [H, M, S]
     :param hour: list with time as 3 numbers
     :return: string with the time formated as H_M_S
     """
-    time = [str(i) for i in hour]
-    return "_".join(time)
+    time_ = [str(i) for i in hour]
+    return "_".join(time_)
 
 
 def create_file_sd_card(gpsModule, gps_parser, mpu_obj, bmp, green_led, red_led):
@@ -110,7 +130,7 @@ def create_file_sd_card(gpsModule, gps_parser, mpu_obj, bmp, green_led, red_led)
     except:
         pass
     os.mkdir(path2)
-    file = path2 + "/paseito.txt"
+    file = path2 + "/paseito.gpx"
     fp = open(file, "x")
     fp.close()
     write_header(file)
@@ -161,10 +181,52 @@ def write_data_to_file(file, gpsModule, gps_parser, mpu, bmp):
     # obtain the line
     line_to_write, values = create_line_to_write(gps_parser, mpu, bmp)
     date = line_to_write.split(",")[0]
+    print(line_to_write)
+    print(values)
     if "00/00/00" in date:
-        return
+        return None, None
+
+    if float(values[1]) == 0:
+        return None, None
+
     print(line_to_write)
     # write the line
-    with open(file, "a") as f:
-        f.write(line_to_write)
-    return values
+
+    return values, line_to_write
+
+def get_minute_from_values(values):
+    datetime = values[0]
+    date, time_ = datetime.split(" ")
+    hr, min, sec = time_.split(":")
+    return min
+
+
+
+def get_average(buffer):
+    datetime = buffer[0][0]
+    buffer_to_avg = [[float(j) for j in i[1:]] for i in buffer]
+    n = len(buffer_to_avg[0])
+    avg = []
+    for i in range(n):
+        current_avg = []
+        for list_of_values in buffer_to_avg:
+            current_avg.append(list_of_values[i])
+        avg.append(sum(current_avg)/len(current_avg))
+    averaged_values_to_write = [datetime] + avg
+    return averaged_values_to_write
+
+
+
+def write_gpx_point(averaged_values_to_write, file_path):
+    datetime, lat, lon, speed, yaw, altitude = averaged_values_to_write
+    print(f"\n{altitude}\n")
+    date, time_ = datetime.split(" ")
+    line = f"""      <trkpt lat="{lat}" lon="{lon}">
+                <desc>"inclinación {yaw}%, velocidad calculada: {speed}km/h"</desc>
+                <ele>{altitude}</ele>
+                <time>{date}T{time_}-03:00</time>
+            </trkpt>"""
+    f = open(file_path, 'a')
+    f.write(line + "\n")  # python will convert \n to os.linesep
+    f.close()
+    return

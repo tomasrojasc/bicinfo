@@ -5,7 +5,8 @@ from drivers.bmp280 import *
 from drivers.mpu6050 import accel
 from utils.lcd import write_lcd, display_menu
 from drivers.i2c_lcd import I2cLcd
-from utils.writeSD import create_file_sd_card, write_data_to_file
+from utils.writeSD import create_file_sd_card, write_data_to_file, \
+    get_minute_from_values, end_gpx_file, get_average, write_gpx_point
 import os
 from drivers.sdcard import SDCard
 from utils.mpu6050 import get_inclination
@@ -50,15 +51,28 @@ shift_menu_state = 0  # esto puede tomar valores 0, 1 y 2 para
 
 while True:
     time.sleep(0.2)
+
+    gps_parser.update_from_line(gpsModule.readline())
+
     if start_end_trip_button.value() == 1:
+        print("hola")
         write_lcd(lcd, "Empezando viaje")
         start_trip_state = 1
         file = create_file_sd_card(gpsModule, gps_parser, mpu, bmp, green_led, red_led)
         inclination_0 = read_acc(mpu)
+        is_first_value = True
+
 
     while start_trip_state == 1:
         time.sleep(0.2)
-        values = write_data_to_file(file, gpsModule, gps_parser, mpu, bmp)
+
+
+        values, line_to_write = write_data_to_file(file, gpsModule, gps_parser, mpu, bmp)
+        print(values)
+        if values:  # si hay valores y no es NoNe
+            write_gpx_point(values, file)
+            is_first_value = False
+
 
         if shift_menu_button.value() == 1:
             shift_menu_state += 1
@@ -67,6 +81,7 @@ while True:
         display_menu(lcd, shift_menu_state, values, inclination_0)
 
         if start_end_trip_button.value() == 1:
+            end_gpx_file(file)
             write_lcd(lcd, "viaje finalizado")
             time.sleep(2)
             write_lcd(lcd, "")
