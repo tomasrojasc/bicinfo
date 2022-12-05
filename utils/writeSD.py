@@ -223,10 +223,11 @@ def write_gpx_point(averaged_values_to_write, file_path):
     date, time_ = datetime.split(" ")
     line = f"""      <trkpt lat="{lat}" lon="{lon}">
                 <desc>"inclinación {yaw}%, velocidad calculada: {speed}km/h"</desc>
+                <speed>{speed}</speed>
                 <ele>{altitude}</ele>
                 <time>{date}T{time_}-03:00</time>
             </trkpt>"""
     f = open(file_path, 'a')
-    f.write(line + "\n")  # python will convert \n to os.linesep
+    f.write(line + "\n")
     f.close()
     return

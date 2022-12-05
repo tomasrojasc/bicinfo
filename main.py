@@ -69,7 +69,7 @@ while True:
 
         values, line_to_write = write_data_to_file(file, gpsModule, gps_parser, mpu, bmp)
         print(values)
-        if values:  # si hay valores y no es NoNe
+        if values:
             write_gpx_point(values, file)
             is_first_value = False
 
@@ -78,7 +78,8 @@ while True:
             shift_menu_state += 1
             shift_menu_state %= 3
 
-        display_menu(lcd, shift_menu_state, values, inclination_0)
+        if values:
+            display_menu(lcd, shift_menu_state, values, inclination_0)
 
         if start_end_trip_button.value() == 1:
             end_gpx_file(file)
