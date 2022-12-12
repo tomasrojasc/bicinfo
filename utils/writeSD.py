@@ -34,8 +34,9 @@ def read_gps(gps_parser):
     timestamp = gps_parser.timestamp
     latitude = get_latitude(gps_parser.latitude)
     longitude = get_longitude(gps_parser.longitude)
+    altitude = gps_parser.altitude
     speed = round(gps_parser.speed[2])  # km/h
-    return [date, timestamp, latitude, longitude, speed]
+    return [date, timestamp, latitude, longitude, speed, altitude]
 
 
 def read_acc(mpu_obj):
@@ -49,9 +50,10 @@ def read_values(gps_parser, mpu_obj, bmp):
     This function reads all the important values to save to a SD
     card or to display to the user
     """
-    gps_data = read_gps(gps_parser)
+    gps_data = read_gps(gps_parser)[:-1]
     acc_data = read_acc(mpu_obj)
     pressure_data = calculate_altitude_from_pressure(bmp.pressure)
+    pressure_data = [read_gps(gps_parser)[-1]]
     values = gps_data + acc_data + [pressure_data]
     return values
 
@@ -224,7 +226,7 @@ def write_gpx_point(averaged_values_to_write, file_path):
     line = f"""      <trkpt lat="{lat}" lon="{lon}">
                 <desc>"inclinación {yaw}%, velocidad calculada: {speed}km/h"</desc>
                 <speed>{speed}</speed>
-                <ele>{altitude}</ele>
+                <ele>{altitude[0]}</ele>
                 <time>{date}T{time_}-03:00</time>
             </trkpt>"""
     f = open(file_path, 'a')

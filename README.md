@@ -39,6 +39,14 @@
 | ADC         | -          |
 | INT         | -          |
 
+### LCD
+| module side | ESP32 side |
+|-------------|------------|
+| VCC         | 5V         |
+| GND         | GND        |
+| SDA         | Pin 4      |
+| SCL         | Pin 5      |
+
 ### I/O
 | device                        | ESP32 side |
 |-------------------------------|------------|
